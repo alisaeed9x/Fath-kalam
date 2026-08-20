@@ -1,0 +1,55 @@
+name: Build APK
+
+# يشتغل أوتوماتيك مع كل push على main، وكمان تقدر تشغّله يدوي من تبويب Actions
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Create local config with API key from GitHub Secret
+        run: |
+          echo "window.LOCAL_DEFAULT_API_KEY = \"${{ secrets.GEMINI_API_KEY }}\";" > app/src/main/assets/config.local.js
+
+      - name: Grant execute permission for gradlew
+        run: |
+          if [ ! -f "./gradlew" ]; then
+            gradle wrapper --gradle-version 8.9
+          fi
+          chmod +x ./gradlew
+
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug --stacktrace
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: fath-kalam-apk
+          path: app/build/outputs/apk/debug/*.apk
+
+      # اختياري: عمل Release تلقائي على GitHub فيه ملف APK جاهز للتحميل المباشر
+      - name: Create GitHub Release
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: "إصدار أوتوماتيكي #${{ github.run_number }}"
+          files: app/build/outputs/apk/debug/*.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

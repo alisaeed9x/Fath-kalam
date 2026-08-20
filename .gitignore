@@ -1,0 +1,9 @@
+# ملف المفتاح المحلي - متترفعش على GitHub أبدًا
+app/src/main/assets/config.local.js
+
+# ملفات بناء Android عادية
+*.apk
+*.aab
+.gradle/
+build/
+local.properties

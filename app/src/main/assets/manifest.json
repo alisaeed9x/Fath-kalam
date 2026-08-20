@@ -1,0 +1,11 @@
+{
+  "name":"فتح كلام",
+  "short_name":"فتح كلام",
+  "start_url":"./index.html",
+  "display":"standalone",
+  "dir":"rtl",
+  "lang":"ar",
+  "background_color":"#202020",
+  "theme_color":"#0078D4",
+  "icons":[{"src":"logo.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}]
+}
